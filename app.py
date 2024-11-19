@@ -4,6 +4,7 @@ from PIL import Image
 import numpy as np
 import tensorflow as tf
 
+# Disable GPU to avoid initialization warnings/errors
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 app = Flask(__name__)
@@ -15,10 +16,12 @@ quality_labels = ['90', '70', '60']
 IMG_SIZE = 128
 
 model_path = "final_model_1.h5"
+
+# Load and recompile the model
 model = tf.keras.models.load_model(model_path)
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-
+# Preprocess the image for prediction
 def preprocess_image(image_path):
     image = Image.open(image_path).convert('RGB')
     image = image.resize((IMG_SIZE, IMG_SIZE))
@@ -26,6 +29,7 @@ def preprocess_image(image_path):
     image_array = np.expand_dims(image_array, axis=0)
     return image_array
 
+# Make predictions using the model
 def predict_image(image_path):
     image_array = preprocess_image(image_path)
     predictions = model.predict(image_array)
@@ -41,6 +45,7 @@ def predict_image(image_path):
 
     return predicted_crop, predicted_quality
 
+# Main route for upload and prediction
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
@@ -53,6 +58,11 @@ def index():
 
         if file:
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+            
+            # Ensure upload folder exists
+            if not os.path.exists(app.config['UPLOAD_FOLDER']):
+                os.makedirs(app.config['UPLOAD_FOLDER'])
+                
             file.save(file_path)
 
             predicted_crop, predicted_quality = predict_image(file_path)
