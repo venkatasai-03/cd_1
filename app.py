@@ -12,7 +12,7 @@ quality_labels = ['90', '70', '60']
 
 IMG_SIZE = 128
 
-model_path = 'final_model_1.h5"
+model_path = "final_model_1.h5"
 model = tf.keras.models.load_model(model_path)
 
 def preprocess_image(image_path):
@@ -60,5 +60,5 @@ def index():
     return render_template('index.html', crop=None, quality=None, image_url=None)
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 10000))
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
