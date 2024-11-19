@@ -4,6 +4,8 @@ from PIL import Image
 import numpy as np
 import tensorflow as tf
 
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
@@ -14,6 +16,8 @@ IMG_SIZE = 128
 
 model_path = "final_model_1.h5"
 model = tf.keras.models.load_model(model_path)
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
 
 def preprocess_image(image_path):
     image = Image.open(image_path).convert('RGB')
